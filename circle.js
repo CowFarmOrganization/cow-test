@@ -156,8 +156,42 @@ function drawSectors() {
                    simpleCircle.animals[i].image_url);
 }
 
-// Функция для изменения порядка секторов при клике на центральный круг
+function updateState(){
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', 'api/state');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            let sectors = [];
+            let animals = [];
+            const json = JSON.parse(xhr.responseText);
+            for (const obj of json["sectors"])
+                sectors.push(new SectorData(obj.id, obj.X, obj.Y, obj.color));
+            for (const obj of json["animals"])
+                animals.push(new AnimalData(obj.id, obj.name, obj.image_url, obj.sector_id, getRandomInt(1, 10), getRandomInt(1, 10)));
+            simpleCircle = new SimpleCircle(json["spins_count"], sectors, animals);
+            console.log(simpleCircle);
+        }
+    };
+}
+
+function saveState(){
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "api/save");
+    xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
+        const body = JSON.stringify(simpleCircle);
+        xhr.onload = () => {
+                if (xhr.readyState == 4 && xhr.status == 201) {
+                        console.log(JSON.parse(xhr.responseText));
+                } else {
+                        console.log(`Error: ${xhr.status}`);
+                }
+        };
+        xhr.send(body);
+}
 function changeSectorsOrder() {
+    saveState();
+    updateState();
     fillCircleWhite();
     turnClockwise()
     drawSectors();
@@ -166,6 +200,7 @@ function changeSectorsOrder() {
 }
 
 // MAIN
+
 fillCircleWhite();
 readJSON();
 // даем время на чтение JSON
