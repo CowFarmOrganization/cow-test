@@ -190,12 +190,12 @@ function saveState(){
         xhr.send(body);
 }
 function changeSectorsOrder() {
-    saveState();
-    updateState();
     fillCircleWhite();
     turnClockwise()
     drawSectors();
     ++simpleCircle.spinCounter;
+    saveState();
+    updateState();
     writeJSON();
 }
 
